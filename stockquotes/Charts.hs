@@ -3,6 +3,7 @@
 module Charts (plotChart) where
 
 import Data.Foldable (toList)
+import Data.List (unzip4)
 import Graphics.Rendering.Chart.Easy hiding (close, label, bars)
 import Graphics.Rendering.Chart.Backend.Diagrams
 
@@ -19,9 +20,10 @@ plotChart title quotes fname = do
   where
     fileOptions = FileOptions (800, 600) SVG loadSansSerifFonts
 
-    (candles, closings, volumes) = unzip3 $
+    (candles, closings, spread, volumes) = unzip4 $
       [ (Candle day low open 0 close high,
         (day, close),
+        (day, (low, high)),
         (day, [volume])) | QuoteData {..} <- toList quotes ]
 
     chart = slayouts_layouts .~
@@ -30,10 +32,13 @@ plotChart title quotes fname = do
         ]
       $ def
 
+    -- Add the spread to the candles chart using Charts gallery example 9
+    -- (https://github.com/timbod7/haskell-chart/wiki/example-9)
     candlesLayout =
        layout_title .~ title
      $ layout_plots .~ [ toPlot $ qline "Close" closings green,
-                         toPlot $ candle "Candle" candles cyan ]
+                         toPlot $ candle "Candle" candles cyan, 
+                         toPlot $ areaBetween "Spread" spread blue]
      $ def
 
     volumesLayout =
@@ -57,6 +62,12 @@ plotChart title quotes fname = do
      $ plot_lines_title  .~ label
      $ def
 
+    areaBetween label values color =
+        plot_fillbetween_style .~ solidFillStyle (withOpacity color 0.4)
+      $ plot_fillbetween_values .~ values
+      $ plot_fillbetween_title .~ label
+      $ def
+
     bars label values color =
        plot_bars_titles .~ [label]
      $ plot_bars_values .~ values
@@ -69,3 +80,4 @@ plotChart title quotes fname = do
        line_width .~ n
      $ line_color .~ opaque color
      $ def
+
