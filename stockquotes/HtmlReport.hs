@@ -22,6 +22,7 @@ colStats :: Colonnade Headed StatEntry Html
 colStats = mconcat
       [ headed "Quote Field" (i . string . show . qfield)
       , headed "Mean" (viaFmt . meanVal)
+      , headed "Median" (viaFmt . medianVal)
       , headed "Min" (viaFmt . minVal)
       , headed "Max" (viaFmt . maxVal)
       , headed "Days between Min/Max" (viaFmt . daysBetweenMinMax)
