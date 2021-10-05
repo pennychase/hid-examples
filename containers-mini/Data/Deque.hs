@@ -1,4 +1,4 @@
--- {-# LANGUAGE NoImplicitPrelude #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module Data.Deque (
     Deque,
@@ -19,7 +19,7 @@ import Prelude (Show)
 
 newtype Deque a = Deque (Seq a)
     deriving Show
-
+    
 empty :: Deque a
 empty = Deque Seq.empty
 

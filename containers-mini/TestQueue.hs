@@ -1,5 +1,7 @@
 import Data.Queue
+import System.Exit (exitFailure)
 
+main :: IO ()
 main = do
     let q = enqueue 15 $ enqueue 10 $ enqueue 5 $ enqueue 0 empty
         -- q == 0, 5, 10, 15 <<-- back
@@ -9,4 +11,6 @@ main = do
                          front q' == Just 10,
                          front q'' == Just 15,
                          isEmpty $ dequeue $ dequeue q' ]
-    print $ and shouldBeTrue
+    case and shouldBeTrue of
+        True -> pure ()
+        False -> exitFailure

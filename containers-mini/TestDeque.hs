@@ -1,5 +1,7 @@
 import Data.Deque
+import System.Exit (exitFailure)
 
+main :: IO ()
 main = do
     let d = push_front 15 $ push_front 10 $ push_front 5 $ push_front 0 empty
         -- d == 15, 10, 5, 0 <-- back
@@ -12,4 +14,6 @@ main = do
                          isEmpty $ pop_front $ pop_front d',
                          isEmpty $ pop_back $ pop_back d'
                         ]
-    print $ and shouldBeTrue
+    case and shouldBeTrue of
+        True -> pure ()
+        False -> exitFailure
