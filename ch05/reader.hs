@@ -12,37 +12,48 @@ type ConfigM = Reader Config
 getConfiguration :: IO Config
 getConfiguration = pure Config { verbose = True {- ... -} }
 
+-- Originally all the returrn types were ConfigM (). But there was no way
+-- to see if the configuration was being used since () was always returned.
+-- Changed the types of all the functions to ConfigM String. Had to change
+-- doSomething to use if-then-else instead of when, both to create an alternative
+-- and to have the right type.
+-- Finally, the code never used the silent config, so added doSomethingSilently
+-- to doSomething.
+
 main :: IO ()
 main = do
   config <- getConfiguration
   let result = runReader work config
   print result
 
-work :: ConfigM ()
+work :: ConfigM String
 work = do
   -- ...
   doSomething
   -- ...
 
-doSomething :: ConfigM ()
+doSomething :: ConfigM String
 doSomething = do
   -- ...
-  doSomethingSpecial
+  special <- doSomethingSpecial
+  silently <- doSomethingSpecialSilently
+  pure $ special ++ " + " ++ silently
   -- ...
 
-doSomethingSpecial :: ConfigM ()
+doSomethingSpecial :: ConfigM String
 doSomethingSpecial = do
   -- ...
   -- Config {verbose} <- ask
   vrb <- asks verbose
-  when vrb beVerbose
+  if vrb then beVerbose else pure "Nothing here"
+  -- when vrb verbose  -- used when type was ConfigM ()
   -- ...
 
-beVerbose :: ConfigM ()
-beVerbose = pure ()
+beVerbose :: ConfigM String
+beVerbose = pure "This is verbose mode"
 
 silent :: Config -> Config
 silent config = config {verbose = False}
 
-doSomethingSpecialSilently :: ConfigM ()
+doSomethingSpecialSilently :: ConfigM String
 doSomethingSpecialSilently = local silent doSomethingSpecial
