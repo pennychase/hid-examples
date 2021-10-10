@@ -1,6 +1,6 @@
 import Data.Foldable (traverse_)
 import System.Environment (getArgs)
-import System.Directory.Extra (doesDirectoryExist, listContents)
+import System.Directory.Extra (doesDirectoryExist, listContents, listFilesRecursive)
 import Control.Monad.Extra (whenM, ifM, zipWithM_)
 import Data.IORef (newIORef, modifyIORef', readIORef)
 
@@ -14,9 +14,6 @@ fileCount fpath = do
    processEntry cnt fp = ifM (doesDirectoryExist fp) (go cnt fp) (inc cnt)
    inc cnt = modifyIORef' cnt (+ 1)
 
---fileCount' :: FilePath -> IO Int
---fileCount' fp = length <$> listFilesRecursive fp
-
 main :: IO ()
 main = do
    args <- getArgs
@@ -24,3 +21,15 @@ main = do
    zipWithM_ printEntry args xs
  where
    printEntry fp n = putStrLn (show n ++ "\t" ++ fp)
+
+-- Count files without IORef
+fileCount' :: FilePath -> IO Int
+fileCount' fp = length <$> listFilesRecursive fp
+
+main' :: IO ()
+main' = do
+    args <- getArgs
+    -- xs <- traverse fileCount' args
+    zipWithM_ printEntry args (traverse fileCount' args)
+  where
+    printEntry fp n = putStrLn (show n ++ "\t" ++ fp)
