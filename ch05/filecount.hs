@@ -29,7 +29,7 @@ fileCount' fp = length <$> listFilesRecursive fp
 main' :: IO ()
 main' = do
     args <- getArgs
-    -- xs <- traverse fileCount' args
-    zipWithM_ printEntry args (traverse fileCount' args)
+    xs <- traverse fileCount' args
+    zipWithM_ printEntry args xs
   where
     printEntry fp n = putStrLn (show n ++ "\t" ++ fp)
