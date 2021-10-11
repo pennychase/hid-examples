@@ -19,7 +19,8 @@ push :: Integer -> EvalM ()
 push x = modify (x:)
 
 pop :: EvalM Integer
-pop = do
+-- pop = state $ \(x:xs) -> (x, xs) 
+pop = do 
   xs <- get
   put (tail xs)
   pure (head xs)
